@@ -24,6 +24,7 @@ async function run() {
         const reviewCollection = database.collection('reviews');
         const buyerCollection = database.collection('buyers');
         const userCollection = database.collection('users');
+        const orderCollection = database.collection('orders');
 
         //GET API
         app.get('/products', async (req, res) => {
@@ -43,8 +44,8 @@ async function run() {
 
         // DELETE API 
         app.delete('/products/:id', async (req, res) => {
-            const id= req.params.id;
-            const query={_id: ObjectId(id)};
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
             const result = await productCollection.deleteOne(query);
             res.json(result);
         })
@@ -89,6 +90,26 @@ async function run() {
             // console.log(result);
             res.json(result);
         })
+
+        // POST orders
+        app.post('/orders', async (req, res) => {
+            const order = req.body;
+            const result = await orderCollection.insertOne(order);
+            res.json(result);
+        })
+
+        //GET API
+        app.get('/orders', async (req, res) => {
+            let query = {};
+            const email = req.query.email;
+            if (email) {
+                query = { email: email };
+            }
+            const cursor = orderCollection.find(query);
+            const services = await cursor.toArray();
+            res.json(services);
+        })
+
 
         // upsert
         app.put('/users', async (req, res) => {
